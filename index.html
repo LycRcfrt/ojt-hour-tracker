@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OJT Hour Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #fff5f7; /* Very light pink background */
+        }
+        .container {
+            max-width: 1500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #e83e8c; /* Pink header */
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #e83e8c; /* Pink header */
+            margin-top: 30px;
+        }
+        input, button, select {
+            width: 95%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+            border: 1px solid #ffb6c1; /* Light pink border */
+            border-radius: 4px;
+        }
+        button {
+            background-color: #e83e8c; /* Pink button */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #d6336c; /* Darker pink on hover */
+        }
+        
+        /* Top section with form and progress */
+        .top-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .entry-form {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #ffb6c1; /* Light pink border */
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .progress-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #ffb6c1; /* Light pink border */
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 30px;
+            background-color: #ffe0e6; /* Light pink background */
+            border-radius: 15px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 30px;
+            background-color: #e83e8c; /* Pink progress bar */
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            line-height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .total {
+            font-weight: bold;
+            text-align: center;
+            margin: 5px 0;
+            font-size: 18px;
+            color: #e83e8c; /* Pink text */
+        }
+        
+        /* Week grid layout */
+        .weeks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 10px;
+        }
+        
+        .week-container {
+            border: 1px solid #ffb6c1; 
+            border-radius: 6px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            background-color: white;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .week-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .week-header {
+            background-color: #ffe0e6; /* Light pink header */
+            padding: 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .week-content {
+            padding: 10px;
+            background-color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+        
+        th, td {
+            padding: 8px;
+            border: 1px solid #ffb6c1; 
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        th {
+            background: #ff99ae; 
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #fff5f7; 
+        }
+        
+        .edit-btn, .delete-btn {
+            padding: 3px 8px;
+            margin: 2px;
+            cursor: pointer;
+            border-radius: 3px;
+            width: auto;
+            font-size: 12px;
+        }
+        
+        .edit-btn {
+            background-color: #9575cd; 
+            color: white;
+            border: none;
+        }
+        
+        .delete-btn {
+            background-color: #f06292; 
+            color: white;
+            border: none;
+        }
+        
+        .edit-form {
+            background-color: #fff5f7; 
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ffb6c1;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        tfoot tr td {
+            background-color: #ffe0e6; 
+            font-weight: bold;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 1px solid #ffb6c1;
+            color: #e83e8c;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>OJT Hour Tracker</h2>
+    
+    <div class="top-section">
+        <div class="entry-form">
+            <h3 style="margin-top: 0;">Add New Entry</h3>
+            <label for="date">Date:</label>
+            <input type="date" id="date">
+            
+            <label for="hours">Hours Worked:</label>
+            <input type="number" id="hours" min="0.5" max="12" step="0.5">
+            
+            <label for="task">Task Description (Optional):</label>
+            <input type="text" id="task" placeholder="What did you work on?">
+
+            <button onclick="addEntry()">Add Entry</button>
+        </div>
+        
+        <div class="progress-section">
+            <h3 style="margin-top: 0;">Your Progress</h3>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <p class="total">Total Hours: <span id="totalHours">0</span> / <span id="requiredHours">500</span></p>
+            <p class="total">Remaining Hours: <span id="remainingHours">500</span></p>
+        </div>
+    </div>
+
+    <h3>Weekly Log</h3>
+    <div id="weeklyLog" class="weeks-grid"></div>
+    
+    <div id="editFormContainer" class="edit-form">
+        <h4 style="color: #e83e8c;">Edit Entry</h4>
+        <input type="hidden" id="editId">
+        <label for="editDate">Date:</label>
+        <input type="date" id="editDate">
+        
+        <label for="editHours">Hours Worked:</label>
+        <input type="number" id="editHours" min="0.5" max="12" step="0.5">
+        
+        <label for="editTask">Task Description:</label>
+        <input type="text" id="editTask">
+        
+        <button onclick="saveEdit()">Save Changes</button>
+        <button onclick="cancelEdit()" style="background-color: #adb5bd;">Cancel</button>
+    </div>
+    
+    <footer>
+        <p>© 2025 OJT Hour Tracker | Layca Saldivar Ricafort</p>
+    </footer>
+</div>
+
+<script>
+    // Initialize data or load from localStorage
+    let entries = JSON.parse(localStorage.getItem('ojtEntries')) || [];
+    const requiredHours = 500;
+
+    // Initial display
+    document.addEventListener('DOMContentLoaded', function() {
+        updateDisplay();
+    });
+
+    function addEntry() {
+        const date = document.getElementById("date").value;
+        const hours = parseFloat(document.getElementById("hours").value);
+        const task = document.getElementById("task").value;
+
+        if (date === "" || isNaN(hours) || hours <= 0) {
+            alert("Please enter a valid date and hours worked.");
+            return;
+        }
+
+        // Create a new entry with a unique ID
+        const entry = {
+            id: Date.now(), // Unique timestamp-based ID
+            date: date,
+            hours: hours,
+            task: task
+        };
+
+        // Add to entries array and save to localStorage
+        entries.push(entry);
+        saveEntries();
+        
+        // Reset form fields
+        document.getElementById("date").value = "";
+        document.getElementById("hours").value = "";
+        document.getElementById("task").value = "";
+        
+        // Update display
+        updateDisplay();
+    }
+
+    function editEntry(id) {
+        // Find the entry
+        const entry = entries.find(entry => entry.id === id);
+        if (!entry) return;
+        
+        // Populate edit form
+        document.getElementById("editId").value = entry.id;
+        document.getElementById("editDate").value = entry.date;
+        document.getElementById("editHours").value = entry.hours;
+        document.getElementById("editTask").value = entry.task || "";
+        
+        // Show edit form
+        document.getElementById("editFormContainer").style.display = "block";
+        
+        // Scroll to edit form
+        document.getElementById("editFormContainer").scrollIntoView({behavior: "smooth"});
+    }
+
+    function saveEdit() {
+        const id = parseInt(document.getElementById("editId").value);
+        const date = document.getElementById("editDate").value;
+        const hours = parseFloat(document.getElementById("editHours").value);
+        const task = document.getElementById("editTask").value;
+
+        if (date === "" || isNaN(hours) || hours <= 0) {
+            alert("Please enter a valid date and hours worked.");
+            return;
+        }
+
+        // Find and update the entry
+        const index = entries.findIndex(entry => entry.id === id);
+        if (index !== -1) {
+            entries[index] = {
+                id: id,
+                date: date,
+                hours: hours,
+                task: task
+            };
+            
+            saveEntries();
+            updateDisplay();
+            cancelEdit();
+        }
+    }
+
+    function cancelEdit() {
+        document.getElementById("editFormContainer").style.display = "none";
+    }
+
+    function deleteEntry(id) {
+        if (confirm("Are you sure you want to delete this entry?")) {
+            entries = entries.filter(entry => entry.id !== id);
+            saveEntries();
+            updateDisplay();
+        }
+    }
+
+    function saveEntries() {
+        localStorage.setItem('ojtEntries', JSON.stringify(entries));
+    }
+
+    function updateDisplay() {
+        // Sort entries by date
+        entries.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        // Calculate total hours
+        const totalHours = entries.reduce((sum, entry) => sum + entry.hours, 0);
+        document.getElementById("totalHours").textContent = totalHours.toFixed(1);
+        document.getElementById("remainingHours").textContent = (requiredHours - totalHours).toFixed(1);
+        
+        // Update progress bar
+        const progressPercent = Math.min((totalHours / requiredHours) * 100, 100);
+        const progressBar = document.getElementById("progressBar");
+        progressBar.style.width = progressPercent + "%";
+        progressBar.textContent = progressPercent.toFixed(1) + "%";
+        
+        // Group entries by week
+        const weeklyEntries = groupEntriesByWeek(entries);
+        
+        // Display weekly entries
+        const weeklyLogContainer = document.getElementById("weeklyLog");
+        weeklyLogContainer.innerHTML = "";
+        
+        if (entries.length === 0) {
+            weeklyLogContainer.innerHTML = "<p style='text-align: center; color: #e83e8c;'>No entries yet. Add your first entry above.</p>";
+            return;
+        }
+        
+        weeklyEntries.forEach((week, index) => {
+            const weekStartDate = new Date(week.startDate);
+            const weekEndDate = new Date(week.endDate);
+            
+            const weekContainer = document.createElement("div");
+            weekContainer.className = "week-container";
+            
+            const weekHeader = document.createElement("div");
+            weekHeader.className = "week-header";
+            const formattedStartDate = formatDate(weekStartDate).split(' ');
+            const formattedEndDate = formatDate(weekEndDate).split(' ');
+            
+            // Format as "Week 1: Feb 10-14, 2025"
+            let weekLabel;
+            if (formattedStartDate[1].replace(',', '') === formattedEndDate[1].replace(',', '') && 
+                formattedStartDate[2] === formattedEndDate[2]) {
+                // Same month and year
+                weekLabel = `Week ${index + 1}: ${formattedStartDate[0]} ${formattedStartDate[1].replace(',', '')}-${formattedEndDate[1].replace(',', '')}, ${formattedEndDate[2]}`;
+            } else if (formattedStartDate[2] === formattedEndDate[2]) {
+                // Different month, same year
+                weekLabel = `Week ${index + 1}: ${formattedStartDate[0]} ${formattedStartDate[1].replace(',', '')} - ${formattedEndDate[0]} ${formattedEndDate[1].replace(',', '')}, ${formattedEndDate[2]}`;
+            } else {
+                // Different year
+                weekLabel = `Week ${index + 1}: ${formatDate(weekStartDate)} - ${formatDate(weekEndDate)}`;
+            }
+            
+            weekHeader.innerHTML = `
+                <span>${weekLabel}</span>
+                <span>${week.totalHours.toFixed(1)} hours</span>
+            `;
+            
+            const weekContent = document.createElement("div");
+            weekContent.className = "week-content";
+            // Display all weeks by default
+            weekContent.style.display = "block";
+            
+            const table = document.createElement("table");
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Hours</th>
+                        <th>Task</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${week.entries.map(entry => `
+                        <tr>
+                            <td>${formatDate(new Date(entry.date))}</td>
+                            <td>${getDayName(new Date(entry.date))}</td>
+                            <td>${entry.hours.toFixed(1)}</td>
+                            <td>${entry.task || "-"}</td>
+                            <td>
+                                <button class="edit-btn" onclick="editEntry(${entry.id})">Edit</button>
+                                <button class="delete-btn" onclick="deleteEntry(${entry.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" style="text-align: right;">Weekly Total:</td>
+                        <td>${week.totalHours.toFixed(1)}</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            `;
+            
+            weekContent.appendChild(table);
+            weekContainer.appendChild(weekHeader);
+            weekContainer.appendChild(weekContent);
+            weeklyLogContainer.appendChild(weekContainer);
+        });
+    }
+
+    function groupEntriesByWeek(entries) {
+        if (entries.length === 0) return [];
+        
+        // Sort entries by date
+        entries.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        const weeks = [];
+        let currentWeek = {
+            startDate: null,
+            endDate: null,
+            entries: [],
+            totalHours: 0
+        };
+        
+        entries.forEach(entry => {
+            const entryDate = new Date(entry.date);
+            
+            // If this is the first entry or if the entry belongs to a new week
+            if (currentWeek.startDate === null || !isSameWeek(entryDate, new Date(currentWeek.startDate))) {
+                // If not the first entry, push the current week to the weeks array
+                if (currentWeek.startDate !== null) {
+                    weeks.push(currentWeek);
+                }
+                
+                // Start a new week
+                const weekStart = getWeekStart(entryDate);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                
+                currentWeek = {
+                    startDate: weekStart,
+                    endDate: weekEnd,
+                    entries: [entry],
+                    totalHours: entry.hours
+                };
+            } else {
+                // Add entry to current week
+                currentWeek.entries.push(entry);
+                currentWeek.totalHours += entry.hours;
+            }
+        });
+        
+        // Push the last week
+        if (currentWeek.startDate !== null) {
+            weeks.push(currentWeek);
+        }
+        
+        return weeks;
+    }
+
+    function getWeekStart(date) {
+        const result = new Date(date);
+        const day = result.getDay();
+        // Set to previous Sunday (0) or current day if it's already Sunday
+        result.setDate(result.getDate() - day);
+        return result;
+    }
+
+    function isSameWeek(date1, date2) {
+        const week1Start = getWeekStart(date1);
+        const week2Start = getWeekStart(date2);
+        return week1Start.getTime() === week2Start.getTime();
+    }
+
+    function formatDate(date) {
+        const options = { month: 'short', day: 'numeric', year: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+    function getDayName(date) {
+        const options = { weekday: 'short' };
+        return date.toLocaleDateString('en-US', options);
+    }
+</script>
+</body>
+</html>
