@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OJT Request Checklist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF0F5;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #FF69B4;
+            margin-bottom: 30px;
+        }
+        .checklist-section {
+            margin-bottom: 30px;
+        }
+        .checklist-section h2 {
+            color: #FF1493;
+            border-bottom: 2px solid #FFB6C1;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .checklist-item input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: #FF69B4;
+        }
+        .checklist-item label {
+            flex-grow: 1;
+        }
+        .checklist-item .status {
+            margin-left: 10px;
+            font-size: 0.8em;
+            color: #888;
+        }
+        #actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #FF1493;
+        }
+        #savedStatus {
+            color: #FF1493;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OJT Request Checklist</h1>
+        
+        <div class="checklist-section" id="requirements">
+            <h2>Requirements</h2>
+            <div id="requirementsList"></div>
+        </div>
+        
+        <div class="checklist-section" id="narrativeReport">
+            <h2>Narrative Report</h2>
+            <div id="narrativeReportList"></div>
+        </div>
+        
+        <div class="checklist-section" id="journal">
+            <h2>Journal</h2>
+            <div id="journalList"></div>
+        </div>
+        
+        <div id="actions">
+            <button id="saveBtn">Save Progress</button>
+            <button id="clearBtn">Clear All</button>
+        </div>
+        
+        <div id="savedStatus"></div>
+    </div>
+
+    <script>
+        // OJT Checklist Items
+        const checklistSections = {
+            requirements: [
+                "Student Personal Information Form",
+                "Resume",
+                "Endorsement Letter",
+                "Letter of Acceptance",
+                "Certificate of Enrollment",
+                "Parent's Consent",
+                "Medical Certificate",
+                "Birth Certificate",
+                "Performance Evaluation Form",
+                "Certificate of Good Moral Character",
+                "Insurance",
+                "PD and IQ Test Result",
+                "Certificate of Employment",
+                "Memorandum of Agreement",
+                "Training Agreement",
+                "Letter of Intent",
+                "Proof of Registration in the Philippines",
+                "Location Map of the Company",
+                "Picture of Company Premises",
+                "Training Plan"
+            ],
+            narrativeReport: [
+                "Guidelines in Choosing an Establishment",
+                "Company Profile",
+                "Company Mission and Vision",
+                "Organizational Chart",
+                "Core Values",
+                "Products and Services",
+                "Classroom Learning/Theories Used during the OJT in Host Company",
+                "Issues and Concerns about the Company",
+                "Recommendations",
+                "Summary of OJT Experience"
+            ],
+            journal: [
+                "Identification Card",
+                "Weekly Progress Report",
+                "Daily Time Record",
+                "Evaluation Form",
+                "Certificate of Completion",
+                "Pictures taken during On-The-Job Training"
+            ]
+        };
+
+        // Render Checklist
+        function renderChecklist() {
+            Object.keys(checklistSections).forEach(section => {
+                const sectionElement = document.getElementById(`${section}List`);
+                sectionElement.innerHTML = '';
+                
+                checklistSections[section].forEach((item, index) => {
+                    const checklistItem = document.createElement('div');
+                    checklistItem.className = 'checklist-item';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `${section}-${index}`;
+                    checkbox.name = `${section}-${index}`;
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `${section}-${index}`;
+                    label.textContent = item;
+                    
+                    checklistItem.appendChild(checkbox);
+                    checklistItem.appendChild(label);
+                    
+                    sectionElement.appendChild(checklistItem);
+                });
+            });
+
+            // Load saved progress
+            loadProgress();
+        }
+
+        // Save Progress
+        function saveProgress() {
+            const progress = {};
+            
+            Object.keys(checklistSections).forEach(section => {
+                progress[section] = {};
+                
+                checklistSections[section].forEach((item, index) => {
+                    const checkbox = document.getElementById(`${section}-${index}`);
+                    progress[section][index] = checkbox.checked;
+                });
+            });
+            
+            localStorage.setItem('ojtChecklistProgress', JSON.stringify(progress));
+            
+            const savedStatus = document.getElementById('savedStatus');
+            savedStatus.textContent = 'Progress saved successfully!';
+            setTimeout(() => {
+                savedStatus.textContent = '';
+            }, 2000);
+        }
+
+        // Load Progress
+        function loadProgress() {
+            const savedProgress = localStorage.getItem('ojtChecklistProgress');
+            
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                
+                Object.keys(progress).forEach(section => {
+                    Object.keys(progress[section]).forEach(index => {
+                        const checkbox = document.getElementById(`${section}-${index}`);
+                        if (checkbox) {
+                            checkbox.checked = progress[section][index];
+                        }
+                    });
+                });
+            }
+        }
+
+        // Clear Progress
+        function clearProgress() {
+            Object.keys(checklistSections).forEach(section => {
+                checklistSections[section].forEach((item, index) => {
+                    const checkbox = document.getElementById(`${section}-${index}`);
+                    checkbox.checked = false;
+                });
+            });
+            
+            localStorage.removeItem('ojtChecklistProgress');
+            
+            const savedStatus = document.getElementById('savedStatus');
+            savedStatus.textContent = 'Progress cleared successfully!';
+            setTimeout(() => {
+                savedStatus.textContent = '';
+            }, 2000);
+        }
+
+        // Event Listeners
+        document.getElementById('saveBtn').addEventListener('click', saveProgress);
+        document.getElementById('clearBtn').addEventListener('click', clearProgress);
+
+        // Initial Render
+        renderChecklist();
+    </script>
+</body>
+</html>
