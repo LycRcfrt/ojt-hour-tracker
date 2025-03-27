@@ -211,6 +211,26 @@
             color: #e83e8c;
             font-size: 14px;
         }
+       
+         .checklist-btn {
+            background-color: #9575cd; 
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .checklist-btn:hover {
+            background-color: #7e57c2;
+        }
+
+        .checklist-container {
+            text-align: center;
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -262,6 +282,11 @@
         <button onclick="cancelEdit()" style="background-color: #adb5bd;">Cancel</button>
     </div>
     
+<div class="checklist-container">
+        <a href="ojt-checklist.html" class="checklist-btn">Go to OJT Checklist</a>
+    </div>
+    
+
     <footer>
         <p>© 2025 OJT Hour Tracker | Layca Saldivar Ricafort</p>
     </footer>
